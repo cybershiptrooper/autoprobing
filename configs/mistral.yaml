@@ -1,0 +1,20 @@
+method: "lr"
+model_name: "mistral-small-3.1-24b"
+train_data: "repe"
+eval_data:
+  - "harm-pressure-knowledge-report"
+  - "harm-pressure-choice"
+  - "convincing-game"
+  - "insider-trading"
+  - "instructed-deception"
+control_data: "alpaca"
+val_data: "mask"
+detect_layers: [10]
+reg_coeff: 10
+max_iter: 1000
+val_fraction: 0.2
+aggregation: "mean"
+alpaca_size: 200
+val_alpaca_size: 200
+output_dir: "outputs/"
+batch_size: 4
