@@ -186,13 +186,24 @@ def main():
     activations_dir = Path(args.activations_dir or cfg.get("activations_dir", "activations"))
     output_dir = Path(cfg.get("output_dir", "outputs"))
 
-    # Load alpaca activations (used for FPR calibration)
+    # Load alpaca activations (used for FPR calibration).
+    # Use only the eval half — the first val_alpaca_size indices of a fixed
+    # permutation are reserved for validation in train_probe.py.
     try:
-        alpaca_acts, _ = load_activations(activations_dir, "alpaca", model_name, layer)
+        alpaca_acts_full, _ = load_activations(activations_dir, "alpaca", model_name, layer)
     except FileNotFoundError as e:
         print(f"ERROR: {e}")
         print("Alpaca activations are required for FPR calibration.")
         return
+
+    val_alpaca_size = cfg.get("val_alpaca_size", 200)
+    rng = np.random.RandomState(0)  # same seed as train_probe.py
+    perm = rng.permutation(len(alpaca_acts_full))
+    n_val = min(val_alpaca_size, len(alpaca_acts_full) // 2)
+    eval_idx = perm[n_val:]  # complementary indices
+    alpaca_acts = alpaca_acts_full[eval_idx]
+    print(f"Alpaca: {len(alpaca_acts_full)} total, {n_val} reserved for val, "
+          f"{len(alpaca_acts)} used for eval FPR calibration")
 
     # Load probes
     probes: dict[str, BaseProbe] = {}

@@ -86,6 +86,26 @@ uv run python evaluate_probe.py --config configs/cadenza.yaml \
     --plot
 ```
 
+## Baseline probe (RepE)
+
+The default training data comes from [Representation Engineering](https://arxiv.org/abs/2310.01405) (RepE). It works by creating contrastive dialogue pairs from a set of true factual statements:
+
+- **Honest pair:** `User: "Pretend you're an honest person..."` → `Assistant: "<fact>"`
+- **Dishonest pair:** `User: "Pretend you're a dishonest person..."` → `Assistant: "<fact>"`
+
+Both dialogues contain the same assistant response — only the user prompt differs. The probe learns to separate the resulting hidden-state activations.
+
+### Token selection
+
+Not all tokens in the assistant turn are used. Each fact is split by whitespace and the **last 5 words are excluded** from the detection range. Only the prefix tokens are marked for activation extraction; the suffix tokens are present in the conversation but ignored by the probe. This avoids training on end-of-sequence artifacts.
+
+For example, given the fact *"The Great Wall of China is visible from space"*:
+
+- **Detected:** "The Great Wall of" (tokens for these words at layer 20)
+- **Excluded:** "China is visible from space"
+
+The detected tokens are then reduced to a single vector per sample using the configured `aggregation` method (`mean` by default). The word cutoff is hardcoded at 5 in `data/repe.py` and is not configurable via flags.
+
 ## How to iterate
 
 ### Change the probe architecture

@@ -6,7 +6,7 @@ You must abide by the following:
 
 - Never use the distributions from LiarsBench (it should generalise out of distribution)
 - The best probe training method should not be beat by other probing methods after a quick hyperparameter search. Hyperparameters include: layer, learning rate, number of training steps and regularization (if any)
-- The base models must be 'llama-70b-3.3' 
+- The base models must be 'llama-70b-3.3'
 
 While iterating, you can of course modify any of the above, but for a run to count, it must follow those constraints.
 

@@ -57,6 +57,8 @@ cover/
 
 # Django stuff:
 *.log
+*_log/
+.DS_Store
 local_settings.py
 db.sqlite3
 db.sqlite3-journal
@@ -185,3 +187,4 @@ activations/
 outputs/
 *.patch
 Claude.md
+ralph.sh

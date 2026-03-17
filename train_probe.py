@@ -111,14 +111,14 @@ def train(
         mask_acts, alpaca_acts = np.array([]), np.array([])
 
     if len(mask_acts) > 0 and len(alpaca_acts) > 0:
-        # Subsample alpaca for validation (default 200, separate from the full
-        # set used during evaluation which defaults to 2000)
-        if val_alpaca_size and len(alpaca_acts) > val_alpaca_size:
-            rng = np.random.RandomState(42)
-            val_alpaca_idx = rng.choice(len(alpaca_acts), val_alpaca_size, replace=False)
-            alpaca_acts_val = alpaca_acts[val_alpaca_idx]
-        else:
-            alpaca_acts_val = alpaca_acts
+        # Split alpaca into disjoint val / eval halves. Validation uses the
+        # first val_alpaca_size indices of a fixed permutation; evaluation
+        # (in evaluate_probe.py) uses the complementary indices.
+        rng = np.random.RandomState(0)
+        perm = rng.permutation(len(alpaca_acts))
+        n_val = min(val_alpaca_size, len(alpaca_acts) // 2)
+        val_idx = perm[:n_val]
+        alpaca_acts_val = alpaca_acts[val_idx]
 
         mask_scores = probe.score(mask_acts)
         alpaca_scores = probe.score(alpaca_acts_val)
