@@ -6,6 +6,8 @@ You must abide by the following:
 
 - Never use the distributions from LiarsBench (it should generalise out of distribution)
 - The best probe training method should not be beat by other probing methods after a quick hyperparameter search. Hyperparameters include: layer, learning rate, number of training steps and regularization (if any)
+- The same probing method should be used across all layers of the model.
+- Never use any test or validation data to train the probes. That will definitely poison the evaluation and make it meaningless.
 - The base models must be 'llama-70b-3.3'
 
 While iterating, you can of course modify any of the above, but for a run to count, it must follow those constraints.
@@ -25,7 +27,7 @@ There's a paper about LiarsBench that explains the baseline probe and the datase
 
 ## Workflow
 
-You should work on a research sprint, where you first brainstorm ideas and search for related work that might be relevant, then pick an idea to investigate and implement it, then iterate on it and see how much progress you can make. Keep a research log as you go in the dir `probe-research/`. For your sprint idea, you should create a new dir in that folder prefixed by the date and start time of the sprint in UTC (e.g. 2026-03-11--10-37) and suffixed with the name of the idea as a title. Put all your code in that dir as well, give it a README.md that describes the idea and the progress you made, and put any plots or data you generate in that dir as well. You should only work on 1 idea, and when you are done you can exit. This will run in a loop so each iteration is a single idea. When you're done, please also make an html webpage containing a report of your research and put it in the same dir as the code including plots and tables as well as the contents of the README.md.
+You should work on a research sprint, where you first brainstorm ideas and search for related work that might be relevant, then pick an idea to investigate and implement it, then iterate on it and see how much progress you can make. Keep a research log as you go in the dir `probe-research/`. For your sprint idea, you should create a new dir in that folder prefixed by the date and start time of the sprint in UTC (e.g. 2026-03-11--10-37) and suffixed with the name of the idea as a title. Put all your code in that dir as well, give it a README.md that describes the idea and the progress you made, and put any plots or data you generate in that dir as well. You should only work on 1 idea, and when you are done you can exit. This will run in a loop so each iteration is a single idea. When you're done, please also make an html webpage containing a report of your research and put it in the same dir as the code including plots and tables as well as the contents of the README.md. Please also report the two metrics mentioned above on all distributions of LiarsBench at the end no matter what new probes you try. 
 
 When you start, the first thing you should do is make the README.md in the sprint dir and describe the idea you're going to try, the motivation behind it, and what you expect to happen. This will help make sure that other agents don't duplicate your work while you're working on it.
 
@@ -33,7 +35,7 @@ Check the experiment results in the `probe-research/` dir, have a look at them f
 
 When you are done, add a DONE.txt file to the dir to indicate that the sprint is complete.
 
-NOTE: If you see existing experiments that do not yet have a DONE.txt file, do not work on them, this means a different agent is already working on it.
+IMPORTANT NOTE: If you see existing sprint folders that do not yet have a DONE.txt file, you can start working directly inside that folder instead (if you find them promising). These folders are from other suspended processes due to server errors.
 
 ## Things to check and verify
 
@@ -45,6 +47,7 @@ As you iterate, you should sanity-check your probes and understand why they work
 - **Baseline sanity checks**: Verify that a random probe scores near chance. Verify that a probe trained on truthful-only data doesn't accidentally learn something useful.
 - **Distribution shift analysis**: Compare the activation distributions between your training data and LiarsBench. Large shifts may explain poor transfer.
 - **Failure case inspection**: Look at examples where your probe confidently gets it wrong — are there common patterns (e.g., certain lie types, topics, or response styles)?
+- **Are things taking too long?**: If your experiments are running on the cpu abd taking more than 10 mins, rewrite the code using pytorch/gpus to run the experiments. 
 
 ## Some ideas to try
 
@@ -53,10 +56,12 @@ Below are just some ideas, you don't need to do these but just thought I'd share
 - Try changing the dataset or the instructions on which the probe is trained on. Maybe the dataset is just too simplistic: There are many ways that language models lie in the real world, whereas the training dataset contains only some universal facts. 
 - Try decomposing the training dataset into various independent factors to make more types of contrastive examples. There may be some factors on which deception detection depends more on?  
 - Research other fields like OOD Generalisation / ICA / loss types for classifiers / etc. See if there are any ideas there that we could try out. 
+- Try various follow-up questions. In the LiarsBench paper, simply asking "were you being deceptive?" to the model didn't work. But do other variants work? What about probing on the user turn like this paper https://arxiv.org/abs/2406.07882?
 - Try variations of attention probes / MLP probes or other architectures. Try googling how changing architecture helped in other contexts. 
 - Try to use multiple OOD datasets to train or evaluate your probes. The golden set of LiarsBench should remain untouched, but maybe you can gain more information by using other equally complex datasets? (For example, see this paper: https://arxiv.org/html/2602.20273v1) Make sure you don't poison the LiarsBench evaluation data in the process!
 - Try googling for interesting research papers and ideas on the internet that could be relevant to the task.
-- Try various follow-up questions. In the LiarsBench paper, simply asking "were you being deceptive?" to the model didn't work. But do other variants work? What about probing on the user turn?
+
+A general advice: if you focus on one direction/concept for too many sprints you might find that you get diminishing returns. This could mean that the class of methods probably aren't promising or you are overfitting on LiarsBench/MASK. So when starting a new sprint, you should always take a few steps back and check if it is worth digging even deeper or trying a new angle completely instead. 
 
 ## Have fun!
 
