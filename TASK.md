@@ -35,7 +35,7 @@ Check the experiment results in the `probe-research/` dir, have a look at them f
 
 When you are done, add a DONE.txt file to the dir to indicate that the sprint is complete.
 
-IMPORTANT NOTE: If you see existing sprint folders that do not yet have a DONE.txt file, you can start working directly inside that folder instead (if you find them promising). These folders are from other suspended processes due to server errors.
+NOTE: If you see existing experiments that do not yet have a DONE.txt file, do not work on them, this means a different agent is already working on it.
 
 ## Things to check and verify
 
